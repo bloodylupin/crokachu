@@ -15,7 +15,7 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 import { MIN_TO_PLAY } from "../Memory";
 import { classNames } from "../../utilities/classNames";
 
-/* tewst firma */
+/* test firma */
 // import { useWeb3React } from "@web3-react/core";
 // import { providers } from "ethers";
 
