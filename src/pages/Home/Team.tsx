@@ -51,7 +51,7 @@ export default function Team() {
             </div>
             <div className="flex flex-col xl:flex-row gap-4 mx-auto px-4 sm:px-6 lg:px-8 text-center justify-center">
                 {teamData.map(t => (
-                    <div key={t.name} className="fade-in flex flex-col gap-4 items-center justify-center">
+                    <div key={t.name} className="fade-in opacity-0 flex flex-col gap-4 items-center justify-center">
                         <picture>
                             <source srcSet={`${t.pfp}.webp`} type="image/webp" />
                             <source srcSet={`${t.pfp}.jpg`} type="image/jpeg" />

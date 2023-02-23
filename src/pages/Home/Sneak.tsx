@@ -14,7 +14,7 @@ type ChosenStateType = ImageType[][];
 export default function Sneak() {
     const [chosen, setChosen] = useState<ChosenStateType>([]);
 
-   // const [change, setChange] = useState<boolean>(false);
+    // const [change, setChange] = useState<boolean>(false);
 
     useEffect(() => {
         const images: ImageType[] = [];
@@ -66,11 +66,15 @@ export default function Sneak() {
                         //markers: true
                     }
                 })
-                .to(".animation-section:nth-child(odd)", {
-                    x: "-50vw"
+                .fromTo(".animation-section:nth-child(odd)", {
+                    x: "-5vw"
+                }, {
+                    x: "-45vw"
                 })
-                .from(".animation-section:nth-child(2)", {
-                    x: "-50vw",
+                .fromTo(".animation-section:nth-child(2)", {
+                    x: "-45vw"
+                }, {
+                    x: "-5vw",
                     delay: -.5
                 });
         }, containerRef);
@@ -106,25 +110,25 @@ export default function Sneak() {
     }, [change])*/
 
     return (
-        <div className="min-h-screen flex flex-col justify-center overflow-hidden" ref={containerRef} onClick={()=>{/*handleOnClick*/}}>
-            <div className="flex w-[150vw] animation-section mt-16">
+        <div className="min-h-screen flex flex-col justify-center overflow-hidden" ref={containerRef} onClick={() => {/*handleOnClick*/ }}>
+            <div className="flex w-[150vw] animation-section mt-16 rotate-3">
                 {chosen[0]?.map(image => (
                     <picture key={uuidv4()} className="aspect-square w-full object-cover">
-                        <img src={`img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="aspect-square" />
+                        <img src={`/img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="w-44 h-44 md:w-40 md:h-40 lg:w-72 lg:h-72 aspect-square shadow-lg shadow-slate-900" />
                     </picture>
                 ))}
             </div>
-            <div className="flex w-[150vw] animation-section">
+            <div className="flex w-[150vw] animation-section -rotate-6">
                 {chosen[1]?.map(image => (
                     <picture key={uuidv4()} className="aspect-square w-full object-cover">
-                        <img src={`img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="aspect-square" />
+                        <img src={`/img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="w-44 h-44 md:w-40 md:h-40 lg:w-72 lg:h-72 aspect-square shadow-lg shadow-slate-900" />
                     </picture>
                 ))}
             </div>
-            <div className="flex w-[150vw] animation-section">
+            <div className="flex w-[150vw] animation-section rotate-3">
                 {chosen[2]?.map(image => (
                     <picture key={uuidv4()} className="aspect-square w-full object-cover">
-                        <img src={`img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="aspect-square" />
+                        <img src={`/img/nft/${image.url}`} alt={`crokachu-${uuidv4()}`} className="w-44 h-44 md:w-40 md:h-40 lg:w-72 lg:h-72 aspect-square shadow-lg shadow-slate-900" />
                     </picture>
                 ))}
             </div>

@@ -17,23 +17,24 @@ type NftProps = {
     maxShow: boolean
     setMaxShow: Dispatch<SetStateAction<boolean>>
 }
+type Metadata = {
+    name: string
+    image: string
+    gatewayImage: string
+    attributes: {
+        trait_type: string
+        value: string
+    }[]
+}
 
 export default function Nft({ uri, inputValue, setInputValue, setProperties, setMaxShow }: NftProps) {
 
-    const [metadata, setMetadata] = useState<{
-        name: string,
-        gatewayImage: string
-        attributes: {
-            trait_type: string
-            value: string
-        }[]
-    }>({ name: "", gatewayImage: "", attributes: [] });
-    const [show, setShow] = useState<boolean>(false);
+    const [metadata, setMetadata] = useState<Metadata>({ name: "", image: "", gatewayImage: "", attributes: [] });
 
     useEffect(() => {
         (async () => {
             try {
-                const singleMetadata = await fetch(uri)
+                const singleMetadata: Metadata = await fetch(uri)
                     .then(resp => resp.json())
                     .then(data => data)
                     .catch((err) => console.log(err));
@@ -44,8 +45,17 @@ export default function Nft({ uri, inputValue, setInputValue, setProperties, set
             }
         })();
 
-        return () => setMetadata({ name: "", gatewayImage: "", attributes: [] });
+        return () => {
+            setMetadata({ name: "", image: "", gatewayImage: "", attributes: [] });
+        }
     }, []);
+
+    const { setCollection } = useCrokachu();
+
+    useEffect(() => {
+        if (metadata.gatewayImage === "") return;
+        setCollection!(prevCollection => [...prevCollection, metadata]);
+    }, [metadata.gatewayImage]);
 
     const [isVisible, setIsVisible] = useState(true);
     useEffect(() => {
@@ -83,6 +93,8 @@ export default function Nft({ uri, inputValue, setInputValue, setProperties, set
             setIsVisible(true);
         };
     }, [metadata.name, inputValue]);
+
+    const [show, setShow] = useState<boolean>(false);
 
     const { favorites, setFavorites } = useCrokachu();
     const [isFavorite, setIsFavorite] = useState(false);

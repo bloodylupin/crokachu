@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 import Header from "./Header";
 import Footer from "./Footer";
@@ -10,12 +10,16 @@ type LayoutPropsType = {
 }
 
 export default function Layout({ children }: LayoutPropsType) {
+
+    const [isLoaded, setIsLoaded] = useState(false);
     return (
         <>
-            <Preloader />
+            <Preloader isLoaded={isLoaded} />
             <Header />
             <div className="absolute top-0 left-0 right-0 h-screen z-0">
-                <video src="vid/crokachu-hero.mp4" muted autoPlay loop playsInline className={`w-full h-full object-cover pointer-events-none`}>
+                <video src="vid/crokachu-hero.mp4" muted autoPlay loop playsInline
+                    onCanPlay={() => setIsLoaded(true)}
+                    className={`w-full h-full object-cover pointer-events-none`}>
                     <source src="vid/crokachu-video.mp4" type="video/mp4"></source>
                 </video>
             </div>

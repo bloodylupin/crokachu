@@ -1,4 +1,4 @@
-import { ReactNode, RefObject, MutableRefObject, useRef, useLayoutEffect } from "react";
+import { ReactNode, RefObject, MutableRefObject, useRef, useLayoutEffect, useState } from "react";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,11 +13,12 @@ export default function AnimationContainer({ children }: AnimationContainerProps
 
     const containerRef: RefObject<HTMLDivElement> | null = useRef(null);
     const fadeInTimelineRef: MutableRefObject<GSAPTimeline | null> | null = useRef(null);
+
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
             const fadeInElements = document.querySelectorAll(".fade-in");
             fadeInTimelineRef!.current = gsap.timeline();
-            fadeInElements.forEach(element => {
+            fadeInElements.forEach((element) => {
                 fadeInTimelineRef.current!.add(gsap
                     .fromTo(element, {
                         autoAlpha: 0,
@@ -30,13 +31,16 @@ export default function AnimationContainer({ children }: AnimationContainerProps
                             start: "top bottom",
                             end: "center 90%",
                             scrub: 1,
-                            //markers: true
+                            //markers: { fontSize: "25px", endColor: "white" },
+
                         }
                     })
                 )
             });
         }, containerRef);
-        return () => ctx.clear();
+        return () => {
+            ctx.clear();
+        }
     }, []);
 
     const changeTextColorTimelineRef: MutableRefObject<GSAPTimeline | null> | null = useRef(null);

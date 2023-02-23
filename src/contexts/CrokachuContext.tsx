@@ -5,6 +5,15 @@ import { useWeb3React } from "@web3-react/core";
 
 import { CONTRACT_ADDRESS, ABI } from "../solidity/solidityData";
 
+type Collection = {
+    name: string,
+    gatewayImage: string
+    attributes: {
+        trait_type: string
+        value: string
+    }[]
+}
+
 type CrokachuContextType = {
     supply: number
     isWhitelisted: boolean | null
@@ -23,6 +32,11 @@ type CrokachuContextType = {
     data: { success: boolean | null, answer: string | string[] | null }
     favorites: string[]
     setFavorites: Dispatch<SetStateAction<string[]>> | null
+    signTransaction: (() => Promise<void>) | null
+    jwtToken?: string | null
+    setJwtToken: Dispatch<SetStateAction<string | null | undefined>> | null
+    collection: Collection[]
+    setCollection: Dispatch<SetStateAction<Collection[]>> | null
 }
 
 const CrokachuContext = createContext<CrokachuContextType>({
@@ -42,7 +56,12 @@ const CrokachuContext = createContext<CrokachuContextType>({
     setShow: null,
     data: { success: null, answer: null },
     favorites: [],
-    setFavorites: null
+    setFavorites: null,
+    signTransaction: null,
+    jwtToken: undefined,
+    setJwtToken: null,
+    collection: [],
+    setCollection: null
 });
 
 export function useCrokachu() {
@@ -75,6 +94,36 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
         getContract();
         return () => setContract(null);
     }, [library]);
+
+    /* JWT TOKEN */
+
+    const [jwtToken, setJwtToken] = useState<string | null | undefined>(undefined);
+    const signTransaction = async () => {
+        try {
+
+            const provider = await library.provider;
+            const web3Provider = new providers.Web3Provider(provider);
+            const signer = web3Provider.getSigner();
+
+            const payload = "hello world";
+            const signature = await signer.signMessage(payload);
+            const response = await fetch("https://jackyolo.xyz/api/signin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "signature": signature,
+                    "payload": payload,
+                    "address": account
+                })
+            });
+            setJwtToken((await response.json()).JWT_TOKEN);
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
 
     /* state for update components */
     const [minted, setMinted] = useState<number>(0);
@@ -314,6 +363,14 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
 
     /* favorites */
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [collection, setCollection] = useState<Collection[]>([]);
+
+    useEffect(() => {
+        return () => {
+            setFavorites([]);
+            setCollection([]);
+        }
+    }, [account]);
 
     /* provider component */
     return <CrokachuContext.Provider value={
@@ -334,7 +391,12 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
             setShow,
             data,
             favorites,
-            setFavorites
+            setFavorites,
+            signTransaction,
+            jwtToken,
+            setJwtToken,
+            collection,
+            setCollection
         }
     }>
         {children}

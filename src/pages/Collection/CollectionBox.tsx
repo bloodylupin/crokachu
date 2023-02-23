@@ -14,33 +14,12 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 
 import { MIN_TO_PLAY } from "../Memory";
 import { classNames } from "../../utilities/classNames";
-
-/* test firma */
-// import { useWeb3React } from "@web3-react/core";
-// import { providers } from "ethers";
+import RandomSelectorButton from "../../components/RandomSelectorButton";
+import ResetSelectionButton from "../../components/ResetSelectionButton";
 
 export default function CollectionBox() {
 
-    /* test firma */
-    // const { library } = useWeb3React();
-
-    // const signTransaction = async () => {
-    //     try {
-            
-    //         const provider = await library.provider;
-    //         const web3Provider = new providers.Web3Provider(provider);
-    //         const signer = web3Provider.getSigner();
-
-    //         const result = await signer.signMessage("hello world");
-    //         console.log(result);
-
-    //     }
-    //     catch (error) {
-    //         console.log(error)
-    //     }
-    // }
-
-    const { uri, favorites, setFavorites } = useCrokachu();
+    const { uri, favorites, setFavorites, collection } = useCrokachu();
 
     const [inputValue, setInputValue] = useState("");
     const handleInputValueChange = (e: BaseSyntheticEvent) => {
@@ -70,7 +49,6 @@ export default function CollectionBox() {
 
     return (
         <>
-            {/* <button onClick={signTransaction}>firma</button> */}
             {show ? <div onClick={() => setShow(false)} className="absolute inset-0 z-10"></div> : null}
             {uri.length ?
                 <>
@@ -78,7 +56,7 @@ export default function CollectionBox() {
                         <input type="text" className="rounded text-slate-900 p-4 w-full relative z-30" onChange={handleInputValueChange} onFocus={() => setShow(true)} value={inputValue} placeholder="Search..." />
                         {inputValue !== "" ?
                             <button onClick={() => setInputValue("")}>
-                                <XMarkIcon className="w-4 h-4 top-1/2 -translate-y-1/2 right-4 z-50 absolute stroke-slate-900" />
+                                <XMarkIcon className="w-10 h-10 top-1/2 -translate-y-1/2 right-4 z-50 absolute stroke-slate-900" />
                             </button>
                             :
                             null}
@@ -87,7 +65,6 @@ export default function CollectionBox() {
                                 return <button className="text-left pl-4 block" key={p} onClick={() => {
                                     setShow(false);
                                     setInputValue(p);
-                                    console.log(show);
                                 }}>{p}</button>
                             }) : null}
                         </div>
@@ -96,7 +73,7 @@ export default function CollectionBox() {
                         {uri.map(u => <Nft key={u} uri={u} inputValue={inputValue} setInputValue={setInputValue} setProperties={setProperties} maxShow={maxShow} setMaxShow={setMaxShow} />)}
                         <label className="opacity-0 absolute  transition-opacity only:opacity-100 only:relative">No matches</label>
                     </div>
-                    <div className="shadow-lg shadow-slate-900 sticky bottom-4 -mr-2 self-end">
+                    <div className="shadow-lg shadow-slate-900 sticky bottom-4 self-end">
                         {favShow ? <div className="bottom-8 grid">
                             {favorites.map((f, i) => (
                                 <Button key={`th-${i}`} className="p-1" onClick={() => {
@@ -107,12 +84,18 @@ export default function CollectionBox() {
                                     <img src={f} className="w-10 h-10" alt={`favorite-thumbnails-${i + 1}`} />
                                 </Button>
                             ))}
+                            {favorites.length < MIN_TO_PLAY ?
+                                <RandomSelectorButton /> :
+                                null}
                         </div> : null}
                         <Button className={classNames(maxShow ? "from-red-600 to-red-900" : "", "block")} onClick={() => setFavShow(prevFavShow => !prevFavShow)}>
                             <div className="w-4 h-4 grid place-content-center">
                                 {maxShow ? "max" : favorites.length}
                             </div>
                         </Button>
+                        {favorites.length > 0 && favShow ?
+                            <ResetSelectionButton /> : null}
+
                         {favorites.length === MIN_TO_PLAY ?
                             <Link to="/memory">
                                 <Button className="block from-orange-400 to-orange-500">

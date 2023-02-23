@@ -5,7 +5,6 @@ import { useCrokachu } from "../contexts/CrokachuContext";
 import Button from "../components/Button";
 
 import MemoryBox from "./Memory/MemoryBox";
-import MemoryGame from "./Memory/MemoryGame";
 import HighScores from "./Memory/HighScores";
 
 export const MIN_TO_PLAY = 6;
@@ -32,8 +31,7 @@ export default function Memory() {
                         </Link>
                     </div> : null
                 }
-                <MemoryBox />
-                {favorites.length === MIN_TO_PLAY ? <MemoryGame /> : null}
+                <MemoryBox />  
             </div>
         </div>
     )

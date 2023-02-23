@@ -26,6 +26,11 @@ export default function Intro() {
                         //markers: true
                     }
                 })
+                .from(".animation-section:nth-child(1) h2", {
+                    autoAlpha: 0,
+                    filter: "blur(50px)",
+                    y: 200
+                })
                 .from(".animation-section:nth-child(2)", {
                     rotate: 360,
                     x: "100%"
@@ -45,12 +50,12 @@ export default function Intro() {
             <div className="min-h-screen animation-container flex relative text-center" ref={containerRef}>
                 <div className="animation-section bg-gradient-to-b from-fuchsia-900 to-slate-900 min-h-screen flex items-center absolute px-4 w-screen">
                     <div className="mx-auto max-w-xl px-4 sm:px-6 lg:px-8">
-                        <h2 className="fade-in">Do you <HeartIcon className="text-red-400 inline w-8" /> Pixel art?</h2>
+                        <h2 className="">Do you <HeartIcon className="text-red-400 inline w-8" /> Pixel art?</h2>
                     </div>
                 </div>
                 <div className="animation-section min-h-screen flex items-center absolute px-4 w-screen">
-                    <div className="bg-gradient-to-tr from-orange-300 to-orange-700 rounded-full mx-auto max-w-[500px] aspect-square p-8 relative">
-                        <video src="vid/crokachu-video.mp4" muted autoPlay loop playsInline className={`w-full h-full aspect-square object-contain pointer-events-none rounded-full`}>
+                    <div className="bg-gradient-to-tr from-orange-300 to-orange-700 rounded-full mx-auto w-72 md:w-96 lg:w-[500px] aspect-square p-8 relative">
+                        <video src="/vid/crokachu-video.mp4" poster="/img/crokachu-ph.png" muted autoPlay loop playsInline className={`w-full h-full aspect-square object-cover pointer-events-none rounded-full`}>
                             <source src="vid/crokachu-video.mp4" type="video/mp4"></source>
                         </video>
                     </div>

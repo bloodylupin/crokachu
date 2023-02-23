@@ -5,74 +5,73 @@ import Home from "./pages/Home";
 import Mint from "./pages/Mint";
 import Royalties from "./pages/Royalties";
 import Collection from "./pages/Collection";
+import Memory from "./pages/Memory";
 
 type Route = {
-  path: string
-  name: string
-  element: JSX.Element
-}
+  path: string;
+  name: string;
+  element: JSX.Element;
+};
 
-type Routes = Route[]
+type Routes = Route[];
 
 export const routes: Routes = [
   {
     path: "/",
     name: "Home",
-    element: <Home />
+    element: <Home />,
   },
   {
     path: "/mint",
     name: "Mint",
-    element: <Mint />
+    element: <Mint />,
   },
   {
     path: "/royalties",
     name: "Royalties",
-    element: <Royalties />
+    element: <Royalties />,
   },
   {
     path: "/collection",
     name: "Collection",
-    element: <Collection />
+    element: <Collection />,
   },
   {
     path: "/memory",
     name: "Memory",
-    element: <Memory />
+    element: <Memory />,
   },
-]
+];
 
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
 
 import { CrokachuProvider } from "./contexts/CrokachuContext";
-import AnimationContainer from "./contexts/AnimationContext";
-import Memory from "./pages/Memory";
 
 const getLibrary = (
-  provider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc
-) => (
-  new ethers.providers.Web3Provider(provider)
-)
+  provider:
+    | ethers.providers.ExternalProvider
+    | ethers.providers.JsonRpcFetchFunc
+) => new ethers.providers.Web3Provider(provider);
 
 function App(): JSX.Element {
   return (
     <div className="App font-pressStart text-white">
       <Web3ReactProvider getLibrary={getLibrary}>
         <CrokachuProvider>
-          <AnimationContainer>
-            <BrowserRouter>
-              <Layout>
-                <Routes>
-                  {[...routes].map(({ path, element }) => <Route path={path} element={element} key={path} />)}
-                </Routes>
-              </Layout>
-            </BrowserRouter>
-          </AnimationContainer>
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                {[...routes].map(({ path, element }) => (
+                  <Route path={path} element={element} key={path} />
+                ))}
+              </Routes>
+            </Layout>
+          </BrowserRouter>
         </CrokachuProvider>
       </Web3ReactProvider>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

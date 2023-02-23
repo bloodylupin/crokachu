@@ -5,10 +5,11 @@ import Sneak from "./Home/Sneak";
 import Roadmap from "./Home/Roadmap";
 import Showcase from "./Home/Showcase";
 import Team from "./Home/Team";
+import AnimationContainer from "./Home/AnimationContainer";
 
 export default function Home() {
   return (
-    <>
+    <AnimationContainer>
       <Hero />
       <Intro />
       <Cards />
@@ -16,6 +17,6 @@ export default function Home() {
       <Roadmap />
       <Showcase />
       <Team />
-    </>
+    </AnimationContainer>
   )
 }
