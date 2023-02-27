@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 import gsap from "gsap";
 import TextPlugin from "gsap/TextPlugin";
@@ -18,7 +18,18 @@ import { MIN_TO_PLAY } from "../Memory";
 import HighScores from "./HighScores";
 import { userNameInterpolation } from "../../contexts/CrokachuContext";
 
-export const gameId = "test";
+export const gameId = "Memory";
+
+const revealAudio = new Audio("/audio/reveal.mp3");
+const successAudio = new Audio("/audio/success.mp3");
+const errorAudio = new Audio("/audio/error.mp3");
+
+const winAudio = new Audio("/audio/win.mp3");
+const loseAudio = new Audio("/audio/lose.mp3");
+
+const bgMusic = new Audio("/audio/bgMusic.mp3");
+
+const introAudio = new Audio("/audio/intro.mp3");
 
 export default function MemoryGame() {
   const { account } = useWeb3React();
@@ -30,7 +41,8 @@ export default function MemoryGame() {
     return () => setUserName(null);
   }, [account]);
 
-  const { favorites, signTransaction, jwtToken, setJwtToken } = useCrokachu();
+  const { favorites, signTransaction, jwtToken, setJwtToken, audioOn } =
+    useCrokachu();
   const [tiles, setTiles] = useState<
     {
       id: number;
@@ -66,11 +78,11 @@ export default function MemoryGame() {
       setPoints(0);
       setMoves(0);
       setTime(60);
-      setStarted(false);
+      setGameStatus("intro");
     };
   }, [show]);
 
-  const containerRef: RefObject<HTMLDivElement> | null = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [tileRevealed, setTileRevealed] = useState<{
     id: number | null;
@@ -88,12 +100,15 @@ export default function MemoryGame() {
     );
     setTileRevealed({ id: id, symbol: tiles[id].image });
 
-    if (tileRevealed.id === null) return;
-    if (tileRevealed.symbol === null) return;
+    if (tileRevealed.id === null && tileRevealed.symbol === null) {
+      audioOn && revealAudio.play();
+      return;
+    }
 
     setMoves((prevMoves) => prevMoves + 1);
 
     if (tileRevealed.symbol === tiles[id].image) {
+      audioOn && successAudio.play();
       setTiles((prevTiles) =>
         prevTiles.map((tile) =>
           tile.id === id || tile.image === tiles[id].image
@@ -104,6 +119,7 @@ export default function MemoryGame() {
       setPoints((prevPoints) => prevPoints + 1);
       setTileRevealed({ id: null, symbol: null });
     } else {
+      audioOn && errorAudio.play();
       containerRef.current?.classList.add("pointer-events-none");
       setTiles((prevGrid) =>
         prevGrid.map((tile) => {
@@ -153,19 +169,57 @@ export default function MemoryGame() {
     }
   }, [points]);
 
-  const [started, setStarted] = useState(false);
+  const [gameStatus, setGameStatus] = useState<
+    "intro" | "started" | "finished"
+  >("intro");
 
   const [time, setTime] = useState(60);
   useEffect(() => {
-    if (!started) return;
-    if (points === MIN_TO_PLAY) return;
+    if (!show) return;
+    if (gameStatus !== "started") return;
+    if (points === MIN_TO_PLAY) {
+      setGameStatus("finished");
+      audioOn && winAudio.play();
+      return;
+    }
+
     const timer = setInterval(() => {
-      setTime((prevTime) => prevTime - 1);
+      setTime((prevTime) => {
+        return prevTime - 1;
+      });
     }, 1000);
+
     return () => clearInterval(timer);
-  }, [started, points]);
+  }, [time, show, gameStatus, points]);
+
+  useEffect(() => {
+    if (!audioOn) return;
+    if (time === 0) {
+      setGameStatus("finished");
+      loseAudio.play();
+    }
+
+    return () => {
+      loseAudio.pause();
+      loseAudio.currentTime = 0;
+    };
+  }, [time]);
 
   gsap.registerPlugin(TextPlugin);
+
+  useEffect(() => {
+    if (!show) return;
+    if (!audioOn) return;
+    if (gameStatus === "started") bgMusic.play();
+    else if (gameStatus === "finished") {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+    return () => {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    };
+  }, [show, gameStatus]);
 
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -173,97 +227,101 @@ export default function MemoryGame() {
 
   useLayoutEffect(() => {
     if (!show) return;
-    const ctx = gsap.context(() => {
-      titleTlRef.current = gsap
-        .timeline({
-          defaults: {
-            duration: 1,
-          },
-          onComplete: () => setStarted(true),
-        })
-        .fromTo(
-          titleRef.current,
-          {
-            autoAlpha: 0,
-            x: 0,
-            y: 0,
-            scale: 1,
-          },
-          {
-            autoAlpha: 1,
-            x: 0,
-            y: 0,
-            text: "Get Ready",
-          }
-        )
-        .fromTo(
-          titleRef.current,
-          {
-            autoAlpha: 0,
-            y: -300,
-            text: "",
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            text: "3",
-            color: "green",
-          }
-        )
-        .fromTo(
-          titleRef.current,
-          {
-            autoAlpha: 0,
-            x: 300,
-            text: "",
-          },
-          {
-            autoAlpha: 1,
-            x: 0,
-            text: "2",
-            color: "yellow",
-          }
-        )
-        .fromTo(
-          titleRef.current,
-          {
-            autoAlpha: 0,
-            y: 300,
-            text: "",
-          },
-          {
-            autoAlpha: 1,
-            y: 0,
-            text: "1",
-            color: "white",
-          }
-        )
-        .fromTo(
-          titleRef.current,
-          {
-            autoAlpha: 0,
-            scale: 0,
-            text: "",
-          },
-          {
-            autoAlpha: 1,
-            scale: 3,
-            text: "GO",
-            color: "red",
-          }
-        )
-        .to(titleRef.current, {
-          duration: 0.5,
-          delay: -0.3,
-          repeat: 1,
+    if (gameStatus !== "intro") return;
+    audioOn && introAudio.play();
+    titleTlRef.current = gsap
+      .timeline({
+        defaults: {
+          duration: 1,
+        },
+        onComplete: () => setGameStatus("started"),
+      })
+      .fromTo(
+        titleRef.current,
+        {
           autoAlpha: 0,
-        })
-        .to(titleContainerRef.current, {
+          x: 0,
+          y: 0,
+          scale: 1,
+        },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          text: "Get Ready",
+        }
+      )
+      .fromTo(
+        titleRef.current,
+        {
           autoAlpha: 0,
-        });
-    });
-    return () => ctx.clear();
-  }, [show, started]);
+          y: -300,
+          text: "",
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          text: "3",
+          color: "green",
+        }
+      )
+      .fromTo(
+        titleRef.current,
+        {
+          autoAlpha: 0,
+          x: 300,
+          text: "",
+        },
+        {
+          autoAlpha: 1,
+          x: 0,
+          text: "2",
+          color: "yellow",
+        }
+      )
+      .fromTo(
+        titleRef.current,
+        {
+          autoAlpha: 0,
+          y: 300,
+          text: "",
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          text: "1",
+          color: "white",
+        }
+      )
+      .fromTo(
+        titleRef.current,
+        {
+          autoAlpha: 0,
+          scale: 0,
+          text: "",
+        },
+        {
+          autoAlpha: 1,
+          scale: 3,
+          text: "GO",
+          color: "red",
+        }
+      )
+      .to(titleRef.current, {
+        duration: 0.5,
+        delay: -0.3,
+        repeat: 1,
+        autoAlpha: 0,
+      })
+      .to(titleContainerRef.current, {
+        autoAlpha: 0,
+      });
+    return () => {
+      titleTlRef.current?.kill();
+      introAudio.pause();
+      introAudio.currentTime = 0;
+    };
+  }, [show, gameStatus]);
 
   return (
     <>
@@ -302,7 +360,7 @@ export default function MemoryGame() {
           {time > 0 ? (
             points < MIN_TO_PLAY ? (
               <>
-                {!started ? (
+                {gameStatus === "intro" ? (
                   <div
                     className="absolute inset-0 z-30 grid place-content-center rounded bg-slate-900/90"
                     ref={titleContainerRef}

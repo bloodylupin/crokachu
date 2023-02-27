@@ -45,6 +45,8 @@ type CrokachuContextType = {
   setJwtToken: Dispatch<SetStateAction<string | null | undefined>> | null;
   collection: Collection[];
   setCollection: Dispatch<SetStateAction<Collection[]>> | null;
+  audioOn: boolean;
+  setAudioOn: Dispatch<SetStateAction<boolean>> | null;
 };
 
 const CrokachuContext = createContext<CrokachuContextType>({
@@ -70,6 +72,8 @@ const CrokachuContext = createContext<CrokachuContextType>({
   setJwtToken: null,
   collection: [],
   setCollection: null,
+  audioOn: false,
+  setAudioOn: null,
 });
 
 export function useCrokachu() {
@@ -152,13 +156,19 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
   const mint = async (amount: number) => {
     setLoading(true);
     try {
-      //const gasLimit = await contract!.estimateGas.mint(amount);
+      const totalPrice = utils.parseEther((price * amount).toString());
+      const gasLimit = await contract!.estimateGas.mint(amount, {
+        value: totalPrice,
+      });
+      
+      const increasedGasLimit = gasLimit.div(100).mul(110);
 
-      //console.log(gasLimit)
+      //console.log("normal gas: ", gasLimit.toString());
+      //console.log("increased gas: ", increasedGasLimit.toString());
 
-      const totalPrice = (price * amount).toString();
       const mint = await contract!.mint(amount, {
-        value: utils.parseEther(`${totalPrice}`),
+        value: totalPrice,
+        gasLimit: increasedGasLimit,
       });
 
       await mint.wait();
@@ -401,6 +411,9 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
     };
   }, [account]);
 
+  /* audio */
+  const [audioOn, setAudioOn] = useState(false);
+
   /* provider component */
   return (
     <CrokachuContext.Provider
@@ -427,6 +440,8 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
         setJwtToken,
         collection,
         setCollection,
+        audioOn,
+        setAudioOn,
       }}
     >
       {children}

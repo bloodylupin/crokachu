@@ -74,7 +74,9 @@ export default function MemoryBox() {
           </>
         ) : null}
       </div>
-      {favorites.length === MIN_TO_PLAY ? <MemoryGame /> : null}
+      {favorites.length === MIN_TO_PLAY ? (
+        <MemoryGame />
+      ) : null}
     </>
   );
 }
