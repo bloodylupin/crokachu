@@ -160,7 +160,7 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
       const gasLimit = await contract!.estimateGas.mint(amount, {
         value: totalPrice,
       });
-      
+
       const increasedGasLimit = gasLimit.div(100).mul(110);
 
       //console.log("normal gas: ", gasLimit.toString());
@@ -389,7 +389,9 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
         if (idArray?.length === 0) return;
         const tempUri = await contract.tokenURI(idArray![0]);
         const uriArray = idArray!.map(
-          (id: number) => `https://ipfs.io/ipfs/${tempUri.split("/")[2]}/${id}`
+          // (id: number) => `https://ipfs.io/ipfs/${tempUri.split("/")[2]}/${id}`
+          (id: number) =>
+            `https://${tempUri.split("/")[2]}.ipfs.nftstorage.link/${id}`
         );
         setUri(uriArray.reverse());
       } catch (err) {
