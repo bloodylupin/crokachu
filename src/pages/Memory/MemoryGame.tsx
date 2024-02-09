@@ -57,8 +57,6 @@ export default function MemoryGame() {
           }
         );
 
-        // console.log(await res.json());
-
         const accountData: {
           [address: string]: {
             name: string;

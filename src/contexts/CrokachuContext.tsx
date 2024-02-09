@@ -391,7 +391,9 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
         if (idArray?.length === 0) return;
         const tempUri = await contract.tokenURI(idArray![0]);
         const uriArray = idArray!.map(
-          (id: number) => `https://ipfs.io/ipfs/${tempUri.split("/")[2]}/${id}`
+          // (id: number) => `https://ipfs.io/ipfs/${tempUri.split("/")[2]}/${id}`
+          (id: number) =>
+            `https://${tempUri.split("/")[2]}.ipfs.nftstorage.link/${id}`
         );
         setUri(uriArray.reverse());
       } catch (err) {
