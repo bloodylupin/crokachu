@@ -7,7 +7,8 @@ import { ChartBarIcon } from "@heroicons/react/24/outline";
 import Button from "../../components/Button";
 import Modal from "../../components/Modal";
 import { classNames } from "../../utilities/classNames";
-import { userNameInterpolation } from "../../contexts/CrokachuContext";
+import userNameInterpolation from "../../utilities/userNameInterpolation";
+import discordNameSlice from "../../utilities/discordNameSlice";
 
 import { gameId } from "./MemoryGame";
 
@@ -22,6 +23,7 @@ export default function HighScores({ placement }: HighScoresProps) {
   const [scores, setScores] = useState<
     {
       name: string;
+      discord_name?: string;
       score: string;
     }[]
   >([]);
@@ -40,7 +42,7 @@ export default function HighScores({ placement }: HighScoresProps) {
           }
         );
         (await res.json()).scores_list.forEach(
-          (s: { name: string; score: string }) =>
+          (s: { name: string; discord_name?: string; score: string }) =>
             setScores((prevScores) => [...prevScores, s])
         );
       } catch (error) {
@@ -61,11 +63,15 @@ export default function HighScores({ placement }: HighScoresProps) {
         <div className="grid gap-4">
           <h2>Best Scores</h2>
           <ul className="rounded bg-fuchsia-900 p-4">
-            {scores.map(({ name, score }, index) =>
+            {scores.map(({ name, discord_name, score }, index) =>
               index < 5 ? (
                 <li key={index} className="grid grid-cols-7 gap-4">
                   <span>{index + 1}</span>
-                  <span className="col-span-4">{name}</span>
+                  <span className="col-span-4">
+                    {discord_name
+                      ? discordNameSlice(discord_name)
+                      : userNameInterpolation(name)}
+                  </span>
                   <span className="col-span-2 border-l-2 text-right">
                     {score}
                   </span>
@@ -77,7 +83,7 @@ export default function HighScores({ placement }: HighScoresProps) {
             <>
               <h2>Your score</h2>
               <ul className="rounded bg-fuchsia-900 p-4">
-                {scores.map(({ name, score }, index) => {
+                {scores.map(({ name, discord_name, score }, index) => {
                   const match =
                     index === placement - 3 ||
                     index === placement - 2 ||
@@ -93,7 +99,11 @@ export default function HighScores({ placement }: HighScoresProps) {
                       )}
                     >
                       <span>{index + 1}</span>
-                      <span className="col-span-4">{name}</span>
+                      <span className="col-span-4">
+                        {discord_name
+                          ? discordNameSlice(discord_name)
+                          : userNameInterpolation(name)}
+                      </span>
                       <span className="col-span-2 border-l-2 text-right">
                         {score}
                       </span>
@@ -111,11 +121,7 @@ export default function HighScores({ placement }: HighScoresProps) {
                   <li className="grid grid-cols-6 gap-4">
                     <span className="col-span-5 text-left">Your Games</span>
                     <span>
-                      {
-                        scores.filter(
-                          (s) => s.name === userNameInterpolation(account)
-                        ).length
-                      }
+                      {scores.filter((s) => s.name === account).length}
                     </span>
                   </li>
                 ) : null}

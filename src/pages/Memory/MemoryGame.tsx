@@ -16,7 +16,8 @@ import Answer from "../../components/Answer";
 import { MIN_TO_PLAY } from "../Memory";
 
 import HighScores from "./HighScores";
-import { userNameInterpolation } from "../../contexts/CrokachuContext";
+import userNameInterpolation from "../../utilities/userNameInterpolation";
+import discordNameSlice from "../../utilities/discordNameSlice";
 
 export const gameId = "Memory";
 
@@ -34,15 +35,46 @@ const introAudio = new Audio("/audio/intro.mp3");
 export default function MemoryGame() {
   const { account } = useWeb3React();
   const [userName, setUserName] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!account) return;
-    setUserName(userNameInterpolation(account));
-    return () => setUserName(null);
-  }, [account]);
+  const [discordName, setDiscordName] = useState<string | null>(null);
 
   const { favorites, signTransaction, jwtToken, setJwtToken, audioOn } =
     useCrokachu();
+
+  useEffect(() => {
+    if (!account) return;
+    if (!jwtToken) return;
+    (async () => {
+      try {
+        setUserName(account);
+        const res = await fetch(
+          "https://jackyolo.xyz/verification-bot/convert-addresses",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ addresses: [account] }),
+          }
+        );
+
+        // console.log(await res.json());
+
+        const accountData: {
+          [address: string]: {
+            name: string;
+            id: string;
+          };
+        } = await res.json();
+
+        if (Object.hasOwn(accountData, account))
+          setDiscordName(accountData[account].name);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+    return () => setUserName(null);
+  }, [account, jwtToken]);
+
   const [tiles, setTiles] = useState<
     {
       id: number;
@@ -351,7 +383,16 @@ export default function MemoryGame() {
           >
             start game
           </Button>
-          {jwtToken ? <p>Signed as {userName}</p> : <p>Playing as guest</p>}
+          {jwtToken ? (
+            <p>
+              Signed as{" "}
+              {discordName
+                ? discordNameSlice(discordName, 11)
+                : userNameInterpolation(userName)}
+            </p>
+          ) : (
+            <p>Playing as guest</p>
+          )}
           <Button onClick={() => setJwtToken!(undefined)}>Sign out</Button>
         </>
       )}

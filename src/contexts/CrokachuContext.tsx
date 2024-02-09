@@ -13,6 +13,8 @@ import { useWeb3React } from "@web3-react/core";
 
 import { CONTRACT_ADDRESS, ABI } from "../solidity/solidityData";
 
+import userNameInterpolation from "../utilities/userNameInterpolation";
+
 type Collection = {
   name: string;
   gatewayImage: string;
@@ -160,7 +162,7 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
       const gasLimit = await contract!.estimateGas.mint(amount, {
         value: totalPrice,
       });
-      
+
       const increasedGasLimit = gasLimit.div(100).mul(110);
 
       //console.log("normal gas: ", gasLimit.toString());
@@ -447,8 +449,4 @@ export function CrokachuProvider({ children }: CrokachuProviderProps) {
       {children}
     </CrokachuContext.Provider>
   );
-}
-
-export function userNameInterpolation(account?: string | null) {
-  return `${account?.slice(2, 5)}...${account?.slice(0 - 3)}`;
 }

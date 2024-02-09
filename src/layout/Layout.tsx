@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutPropsType) {
     <>
       <Preloader isLoaded={isLoaded} />
       <Header />
-      <div className="absolute top-0 left-0 right-0 z-0 h-screen">
+      <div className="absolute inset-0 z-0 h-screen">
         <video
           src="vid/crokachu-hero.mp4"
           muted
