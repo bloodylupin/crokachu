@@ -54,9 +54,10 @@ export default function Nft({
           .then((resp) => resp.json())
           .then((data) => data)
           .catch((err) => console.log(err));
-        const gatewayImage = `https://ipfs.io/ipfs/${
+        // const gatewayImage = `https://ipfs.io/ipfs/${singleMetadata.image.split("/")[2]}/${singleMetadata.image.split("/")[3]}`;
+        const gatewayImage = `https://${
           singleMetadata.image.split("/")[2]
-        }/${singleMetadata.image.split("/")[3]}`;
+        }.ipfs.nftstorage.link/${singleMetadata.image.split("/")[3]}`;
         setMetadata({ ...singleMetadata, gatewayImage });
       } catch (err) {
         console.log(err);
